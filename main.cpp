@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -20,6 +21,34 @@ struct Player {
     float pointsPerGamePlayed;
     string iceTimePerGamePlayed;
 };
+
+void headers() {
+    cout << left
+            << "\n- NHL PLAYER STATS 23/24 SEASON -\n\n"
+            << setw(24) << "Name"
+            << setw(10) << "Team"
+            << setw(10) << "Position"
+            << setw(15) << "Games Played"
+            << setw(10) << "Goals"
+            << setw(10) << "Points"
+            << setw(20) << "Points Per Game"
+            << setw(20) << "Ice Time Per Game"
+            << "\n----------------------------------------------------------------------------------------------------------------------"
+            << endl;
+}
+
+void displayPlayer(const Player &player) {
+    cout << left
+            << setw(24) << player.name
+            << setw(10) << player.team
+            << setw(10) << player.position
+            << setw(15) << player.gamesPlayed
+            << setw(10) << player.goals
+            << setw(10) << player.points
+            << setw(20) << player.pointsPerGamePlayed
+            << setw(20) << player.iceTimePerGamePlayed
+            << endl;
+}
 
 void parse(string line, Player &player) {
     stringstream ss(line);
@@ -43,14 +72,14 @@ void parse(string line, Player &player) {
     getline(ss, temp, ',');
     player.pointsPerGamePlayed = stof(temp);
 
-    // getline(ss, player.iceTimePerGamePlayed);
-    getline(ss, player.iceTimePerGamePlayed, ',');
+    getline(ss, player.iceTimePerGamePlayed);
 }
 
 void readCSV() {
     ifstream fin("nhlstats2324.csv");
 
     if (fin) {
+        headers();
         while (!fin.eof()) {
             string line;
             getline(fin, line);
@@ -59,12 +88,14 @@ void readCSV() {
 
             if (line.length() > 0) {
                 parse(line, player);
-                cout << player.name << ", "
-                << player.team << ", " << player.position << ", "
-                << player.gamesPlayed << ", " << player.goals << ", "
-                << player.points << ", " << player.pointsPerGamePlayed << ", "
-                << player.iceTimePerGamePlayed
-                << endl;
+                // cout << player.name << ", "
+                // << player.team << ", " << player.position << ", "
+                // << player.gamesPlayed << ", " << player.goals << ", "
+                // << player.points << ", " << player.pointsPerGamePlayed << ", "
+                // << player.iceTimePerGamePlayed
+                // << endl;
+
+                displayPlayer(player);
             }
         }
         fin.close();
