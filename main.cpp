@@ -2,14 +2,9 @@
 #include <sstream>
 #include <fstream>
 #include <iomanip>
+#include <vector>
 
 using namespace std;
-
-void readCSV();
-
-int main() {
-    readCSV();
-}
 
 struct Player {
     string name;
@@ -102,5 +97,35 @@ void readCSV() {
     }
     else {
         cout << "File not found !" << endl;
+    }
+}
+
+void load(string fileName, vector<Player> &players) {
+    ifstream fin(fileName);
+    if (fin) {
+        string line;
+        while (getline(fin, line)) {
+            Player player;
+            parse(line, player);
+            players.push_back(player);
+        }
+        fin.close();
+    }
+    else {
+        cout << "File not found !" << endl;
+    }
+}
+
+int main() {
+    cout << "[ ..READING FROM CSV FILE ]";
+    readCSV();
+
+    vector<Player> p;
+    load("nhlstats2324.csv", p);
+
+    cout << "\n[ ..READING CSV FILE FROM VECTOR OF STRUCTS ]";
+    headers();
+    for (int i = 0; i < p.size(); i++) {
+        displayPlayer(p[i]);
     }
 }
