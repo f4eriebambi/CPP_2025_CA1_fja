@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <cstring>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ void displayPlayer(const Player &player) {
             << setw(15) << player.gamesPlayed
             << setw(10) << player.goals
             << setw(10) << player.points
-            << setw(20) << player.pointsPerGamePlayed
+            << setw(20) << fixed << setprecision(2) << player.pointsPerGamePlayed // https://www.geeksforgeeks.org/rounding-floating-point-number-two-decimal-places-c-c/
             << setw(20) << player.iceTimePerGamePlayed
             << endl;
 }
@@ -116,16 +117,100 @@ void load(string fileName, vector<Player> &players) {
     }
 }
 
-int main() {
-    cout << "[ ..READING FROM CSV FILE ]";
-    readCSV();
+void display(const vector<Player> &players) {
+    vector<Player>::const_iterator iter;
+    for (iter = players.cbegin(); iter != players.cend(); iter++) {
+        if (iter != players.cbegin()) {
+            cout << left
+           << setw(24) << iter->name
+           << setw(10) << iter->team
+           << setw(10) << iter->position
+           << setw(15) << iter->gamesPlayed
+           << setw(10) << iter->goals
+           << setw(10) << iter->points
+           << setw(20) << fixed << setprecision(2) << iter->pointsPerGamePlayed
+           << setw(20) << iter->iceTimePerGamePlayed
+           << endl;
+        }
+    }
+}
 
+int searchStats(const vector<Player> &players, char position = 'D') {
+    vector<Player>::const_iterator iter;
+    for (iter = players.cbegin(); iter != players.cend(); iter++) {
+        if (iter->position == position) {
+            // cout << left
+            // << setw(24) << iter->name
+            // << setw(10) << iter->team
+            // << setw(10) << iter->position
+            // << setw(15) << iter->gamesPlayed
+            // << setw(10) << iter->goals
+            // << setw(10) << iter->points
+            // << setw(20) << fixed << setprecision(2) << iter->pointsPerGamePlayed
+            // << setw(20) << iter->iceTimePerGamePlayed
+            // << endl;
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int searchStats2(const vector<Player> &players, char position = 'D') {
+    return -1;
+}
+
+int countRows(const vector<Player> &players) {
+}
+
+void displayPlayerByTeam(const vector<Player> &players, const string &team) {
+    bool found = false;
+    for (const Player &player : players) {
+        if (player.team == team) {
+            cout << left
+            << setw(24) << player.name
+            << setw(10) << player.team
+            << setw(10) << player.position
+            << setw(15) << player.gamesPlayed
+            << setw(10) << player.goals
+            << setw(10) << player.points
+            << setw(20) << fixed << setprecision(2) << player.pointsPerGamePlayed
+            << setw(20) << player.iceTimePerGamePlayed
+            << endl;
+            found = true;
+        }
+    }
+    if (!found) {
+        cout << "No players found on the team " << team << endl;
+    }
+}
+
+int main() {
+    // STAGE 1
+    // cout << "[ ..READING FROM CSV FILE ]";
+    // readCSV();
+
+
+    //STAGE 2
     vector<Player> p;
     load("nhlstats2324.csv", p);
+    // cout << "\n[ ..READING CSV FILE WITH VECTOR OF STRUCTS ]";
+    // headers();
+    // for (int i = 0; i < p.size(); i++) {
+    //     displayPlayer(p[i]);
+    // }
 
-    cout << "\n[ ..READING CSV FILE FROM VECTOR OF STRUCTS ]";
+
+    // STAGE 3
+    // cout << "\n[testing display func]";
+    // headers();
+    // display(p);
+    // cout << "\n[testing searchStats - position func]";
+    // searchStats(p);
+    // cout << "\n[testing displayPlayerByTeam - ]";
+    cout << "Enter a team name : \n";
+    string team;
+    cin >> team;
     headers();
-    for (int i = 0; i < p.size(); i++) {
-        displayPlayer(p[i]);
-    }
+    cout << "OF A PARTICULAR TEAM ::\n\n";
+    displayPlayerByTeam(p, team);
 }
