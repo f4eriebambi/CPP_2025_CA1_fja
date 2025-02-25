@@ -3,7 +3,8 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
-#include <cstring>
+#include <climits>
+#include <cmath>
 
 using namespace std;
 
@@ -97,7 +98,7 @@ void readCSV() {
         fin.close();
     }
     else {
-        cout << "File not found !" << endl;
+        cout << "\nFile not found !" << endl;
     }
 }
 
@@ -113,7 +114,7 @@ void load(string fileName, vector<Player> &players) {
         fin.close();
     }
     else {
-        cout << "File not found !" << endl;
+        cout << "\nFile not found !" << endl;
     }
 }
 
@@ -135,31 +136,17 @@ void display(const vector<Player> &players) {
     }
 }
 
-int searchStats(const vector<Player> &players, char position = 'D') {
-    vector<Player>::const_iterator iter;
-    for (iter = players.cbegin(); iter != players.cend(); iter++) {
-        if (iter->position == position) {
-            // cout << left
-            // << setw(24) << iter->name
-            // << setw(10) << iter->team
-            // << setw(10) << iter->position
-            // << setw(15) << iter->gamesPlayed
-            // << setw(10) << iter->goals
-            // << setw(10) << iter->points
-            // << setw(20) << fixed << setprecision(2) << iter->pointsPerGamePlayed
-            // << setw(20) << iter->iceTimePerGamePlayed
-            // << endl;
-            return 0;
+int searchPosition(const vector<Player> &players, char position = 'p') {
+    for (int i = 0; i < players.size(); i++) {
+        if (players[i].position == position) {
+            return i;
         }
     }
     return -1;
 }
 
-int searchStats2(const vector<Player> &players, char position = 'D') {
-    return -1;
-}
-
 int countRows(const vector<Player> &players) {
+    vector<Player>::const_iterator iter;
 }
 
 void displayPlayerByTeam(const vector<Player> &players, const string &team) {
@@ -184,33 +171,84 @@ void displayPlayerByTeam(const vector<Player> &players, const string &team) {
     }
 }
 
+int highLowAvgGoals(const vector<Player> &players, Player &highestScorer, Player &lowestScorer) {
+    int max = INT_MIN;
+    int min = INT_MAX;
+    double total = 0;
+    // Player highestScorer;
+    // Player lowestScorer;
+
+    for (const Player &player : players) {
+        if (player.goals > max) {
+            max = player.goals;
+            highestScorer = player;
+        }
+        if (player.goals < min) {
+            min = player.goals;
+            lowestScorer = player;
+        }
+        total += player.goals;
+    }
+    double average = total / players.size();
+    int averageGoal = (int)round(average);
+
+    cout << "Highest Number of Goals made in 23/24 Season :: " << max<< ", made by "
+    << highestScorer.name << endl;
+    cout << "Lowest Number of Goals made in 23/24 Season :: " << min << ", made by "
+    << lowestScorer.name << endl;
+    cout << "Average Goals Scored in 23/24 Season :: " << averageGoal << endl;
+
+    return averageGoal;
+}
+
 int main() {
     // STAGE 1
-    // cout << "[ ..READING FROM CSV FILE ]";
-    // readCSV();
+    cout << "[ ..READING FROM CSV FILE ]";
+    readCSV();
 
 
     //STAGE 2
+    cout << "\n[ ..READING CSV FILE WITH VECTOR OF STRUCTS ]";
     vector<Player> p;
     load("nhlstats2324.csv", p);
-    // cout << "\n[ ..READING CSV FILE WITH VECTOR OF STRUCTS ]";
-    // headers();
-    // for (int i = 0; i < p.size(); i++) {
-    //     displayPlayer(p[i]);
-    // }
+    headers();
+    for (int i = 0; i < p.size(); i++) {
+        displayPlayer(p[i]);
+    }
 
 
     // STAGE 3
-    // cout << "\n[testing display func]";
-    // headers();
-    // display(p);
-    // cout << "\n[testing searchStats - position func]";
-    // searchStats(p);
-    // cout << "\n[testing displayPlayerByTeam - ]";
+    cout << "\n[testing display func]";
+    headers();
+    display(p);
+    cout << "\n[testing searchPosition]\n";
+    int index = searchPosition(p, 'D');
+    if (index == -1) {
+        cout << "No player(s) found at the index" << endl;
+    }
+    else {
+        headers();
+        cout << "Player found at Index " << index << " ::\n" << endl;
+        cout << left
+        << setw(24) << p[index].name
+        << setw(10) << p[index].team
+        << setw(10) << p[index].position
+        << setw(15) << p[index].gamesPlayed
+        << setw(10) << p[index].goals
+        << setw(10) << p[index].points
+        << setw(20) << fixed << setprecision(2) << p[index].pointsPerGamePlayed
+        << setw(20) << p[index].iceTimePerGamePlayed
+        << endl;
+    }
+    cout << "\n[testing displayPlayerByTeam]\n";
     cout << "Enter a team name : \n";
     string team;
     cin >> team;
     headers();
-    cout << "OF A PARTICULAR TEAM ::\n\n";
+    cout << "PLayer(s) of " << team << " ::\n\n";
     displayPlayerByTeam(p, team);
+    cout << "\n[testing highLowAvgGoals]\n";
+    Player highestScorer;
+    Player lowestScorer;
+    highLowAvgGoals(p, highestScorer, lowestScorer);
 }
