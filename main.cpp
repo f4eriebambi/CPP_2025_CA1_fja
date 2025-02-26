@@ -1,10 +1,11 @@
 #include <iostream>
-#include <sstream>
 #include <fstream>
 #include <iomanip>
 #include <vector>
-#include <climits>
 #include <cmath>
+#include <list>
+#include <algorithm>
+#include <map>
 
 using namespace std;
 
@@ -123,15 +124,15 @@ void display(const vector<Player> &players) {
     for (iter = players.cbegin(); iter != players.cend(); iter++) {
         if (iter != players.cbegin()) {
             cout << left
-           << setw(24) << iter->name
-           << setw(10) << iter->team
-           << setw(10) << iter->position
-           << setw(15) << iter->gamesPlayed
-           << setw(10) << iter->goals
-           << setw(10) << iter->points
-           << setw(20) << fixed << setprecision(2) << iter->pointsPerGamePlayed
-           << setw(20) << iter->iceTimePerGamePlayed
-           << endl;
+            << setw(24) << iter->name
+            << setw(10) << iter->team
+            << setw(10) << iter->position
+            << setw(15) << iter->gamesPlayed
+            << setw(10) << iter->goals
+            << setw(10) << iter->points
+            << setw(20) << fixed << setprecision(2) << iter->pointsPerGamePlayed
+            << setw(20) << iter->iceTimePerGamePlayed
+            << endl;
         }
     }
 }
@@ -145,9 +146,8 @@ int searchPosition(const vector<Player> &players, char position = 'p') {
     return -1;
 }
 
-int countRows(const vector<Player> &players) {
-    vector<Player>::const_iterator iter;
-}
+// 3.3
+// https://www.geeksforgeeks.org/map-of-vectors-in-c-stl-with-examples/
 
 void displayPlayerByTeam(const vector<Player> &players, const string &team) {
     bool found = false;
@@ -201,6 +201,21 @@ int highLowAvgGoals(const vector<Player> &players, Player &highestScorer, Player
     return averageGoal;
 }
 
+list<Player> searchPlayerName(const vector<Player> &players, const string &search) {
+    list<Player> pList;
+    vector<Player>::const_iterator iter;
+    for (iter = players.cbegin(); iter != players.cend(); iter++) {
+        if (iter->name.find(search) != string::npos) { // https://stackoverflow.com/questions/29461786/partial-string-search-in-c
+            pList.push_back(*iter);
+        }
+    }
+    return pList;
+}
+
+int descendingPointsPerGame(const Player &x, const Player &y) {
+    return x.pointsPerGamePlayed > y.pointsPerGamePlayed;
+}
+
 int main() {
     // STAGE 1
     cout << "[ ..READING FROM CSV FILE ]";
@@ -221,6 +236,7 @@ int main() {
     cout << "\n[testing display func]";
     headers();
     display(p);
+    // 3.2
     cout << "\n[testing searchPosition]\n";
     int index = searchPosition(p, 'D');
     if (index == -1) {
@@ -240,6 +256,8 @@ int main() {
         << setw(20) << p[index].iceTimePerGamePlayed
         << endl;
     }
+    // 3.3
+    // 3.4
     cout << "\n[testing displayPlayerByTeam]\n";
     cout << "Enter a team name : \n";
     string team;
@@ -247,8 +265,32 @@ int main() {
     headers();
     cout << "PLayer(s) of " << team << " ::\n\n";
     displayPlayerByTeam(p, team);
+    // 3.5
     cout << "\n[testing highLowAvgGoals]\n";
     Player highestScorer;
     Player lowestScorer;
     highLowAvgGoals(p, highestScorer, lowestScorer);
+    // 3.6
+    cout << "\n[testing searchPlayerName]\n";
+    cout << "Enter text to search players names : \n";
+    string search;
+    cin >> search;
+    list<Player> searchNames = searchPlayerName(p, search);
+    if (!searchNames.empty()) {
+        headers();
+        cout << "Player(s) found with a name containing '" << search << "' ::\n" << endl;
+        for (const Player &player : searchNames) {
+            displayPlayer(player);
+        }
+    }
+    else {
+        cout << "No player(s) found with a name containing '" << search << "'" << endl;
+    }
+    // 3.7
+    cout << "\n[testing descendingPointsPerGame]\n";
+    vector <Player> pDesc = p;
+    sort(pDesc.begin(), pDesc.end(), descendingPointsPerGame);
+    headers();
+    cout << "Players sorted by Points Per Games in descending order ::\n" << endl;
+    display(pDesc);
 }
