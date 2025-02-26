@@ -146,8 +146,13 @@ int searchPosition(const vector<Player> &players, char position = 'p') {
     return -1;
 }
 
-// 3.3
-// https://www.geeksforgeeks.org/map-of-vectors-in-c-stl-with-examples/
+map<string,int> countTeamPlayerRows(const vector<Player> &players) { // https://www.geeksforgeeks.org/map-of-vectors-in-c-stl-with-examples/
+    map<string, int> count;
+    for (int i = 0; i < players.size(); i++) {
+        count[players[i].team]++;
+    }
+    return count;
+}
 
 void displayPlayerByTeam(const vector<Player> &players, const string &team) {
     bool found = false;
@@ -257,6 +262,11 @@ int main() {
         << endl;
     }
     // 3.3
+    cout << "\n[testing countTeamPlayerRows]\n";
+    map<string,int> countPlayers = countTeamPlayerRows(p);
+    for (const auto &teamCount : countPlayers) {
+        cout << teamCount.first << " : " << teamCount.second << endl; // https://www.geeksforgeeks.org/pair-in-cpp-stl/
+    }
     // 3.4
     cout << "\n[testing displayPlayerByTeam]\n";
     cout << "Enter a team name : \n";
