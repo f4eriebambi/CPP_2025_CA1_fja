@@ -9,20 +9,10 @@
 
 using namespace std;
 
-struct Player {
-    string name;
-    string team;
-    char position;
-    int gamesPlayed;
-    int goals;
-    int points;
-    float pointsPerGamePlayed;
-    string iceTimePerGamePlayed;
-};
-
 void headers() {
     cout << left
-            << "\n- NHL PLAYER STATS 23/24 SEASON -\n\n"
+            << "\n========== NHL PLAYER STATS 23/24 SEASON ==========\n"
+    // "\n- NHL PLAYER STATS 23/24 SEASON -\n"
             << setw(24) << "Name"
             << setw(10) << "Team"
             << setw(10) << "Position"
@@ -35,19 +25,83 @@ void headers() {
             << endl;
 }
 
-void displayPlayer(const Player &player) {
-    cout << left
-            << setw(24) << player.name
-            << setw(10) << player.team
-            << setw(10) << player.position
-            << setw(15) << player.gamesPlayed
-            << setw(10) << player.goals
-            << setw(10) << player.points
-            << setw(20) << fixed << setprecision(2) << player.pointsPerGamePlayed // https://www.geeksforgeeks.org/rounding-floating-point-number-two-decimal-places-c-c/
-            << setw(20) << player.iceTimePerGamePlayed
-            << endl;
+// ---- STAGE 1 ----
+void parse(string line, string &name, string &team, char &position,
+    int &gamesPlayed, int &goals, int &points, float &pointsPerGamePlayed,
+    string &iceTimePerGamePlayed) {
+    stringstream ss(line);
+    string temp;
+
+    getline(ss, name, ',');
+    getline(ss, team, ',');
+
+    getline(ss, temp, ',');
+    position = temp[0];
+
+    getline(ss, temp, ',');
+    gamesPlayed = stoi(temp);
+
+    getline(ss, temp, ',');
+    goals = stoi(temp);
+
+    getline(ss, temp, ',');
+    points = stoi(temp);
+
+    getline(ss, temp, ',');
+    pointsPerGamePlayed = stof(temp);
+
+    getline(ss, iceTimePerGamePlayed, ',');
+}
+void readCSV() {
+    ifstream fin("nhlstats2324.csv");
+
+    if (fin) {
+        headers();
+        while (!fin.eof()) {
+            string line;
+            getline(fin, line);
+
+            string name, team, iceTimePerGamePlayed;
+            char position;
+            int gamesPlayed, goals,  points;
+            float pointsPerGamePlayed;
+
+            if (line.length() > 0) {
+                parse(line, name, team, position,
+                    gamesPlayed, goals, points, pointsPerGamePlayed,
+                    iceTimePerGamePlayed);
+
+                cout << left
+                << setw(24) << name
+                << setw(10) << team
+                << setw(10) << position
+                << setw(15) << gamesPlayed
+                << setw(10) << goals
+                << setw(10) << points
+                << setw(20) << fixed << setprecision(2) << pointsPerGamePlayed // https://www.geeksforgeeks.org/rounding-floating-point-number-two-decimal-places-c-c/
+                << setw(20) << iceTimePerGamePlayed
+                << endl;
+            }
+        }
+        fin.close();
+    }
+    else {
+        cout << "\nFile not found !" << endl;
+    }
 }
 
+// ---- STAGE 2.1 ----
+struct Player {
+    string name;
+    string team;
+    char position;
+    int gamesPlayed;
+    int goals;
+    int points;
+    float pointsPerGamePlayed;
+    string iceTimePerGamePlayed;
+};
+// ---- STAGE 2.2 ----
 void parse(string line, Player &player) {
     stringstream ss(line);
     string temp;
@@ -72,37 +126,6 @@ void parse(string line, Player &player) {
 
     getline(ss, player.iceTimePerGamePlayed);
 }
-
-void readCSV() {
-    ifstream fin("nhlstats2324.csv");
-
-    if (fin) {
-        headers();
-        while (!fin.eof()) {
-            string line;
-            getline(fin, line);
-
-            Player player;
-
-            if (line.length() > 0) {
-                parse(line, player);
-                // cout << player.name << ", "
-                // << player.team << ", " << player.position << ", "
-                // << player.gamesPlayed << ", " << player.goals << ", "
-                // << player.points << ", " << player.pointsPerGamePlayed << ", "
-                // << player.iceTimePerGamePlayed
-                // << endl;
-
-                displayPlayer(player);
-            }
-        }
-        fin.close();
-    }
-    else {
-        cout << "\nFile not found !" << endl;
-    }
-}
-
 void load(string fileName, vector<Player> &players) {
     ifstream fin(fileName);
     if (fin) {
@@ -118,7 +141,20 @@ void load(string fileName, vector<Player> &players) {
         cout << "\nFile not found !" << endl;
     }
 }
+void displayPlayer(const Player &player) {
+    cout << left
+            << setw(24) << player.name
+            << setw(10) << player.team
+            << setw(10) << player.position
+            << setw(15) << player.gamesPlayed
+            << setw(10) << player.goals
+            << setw(10) << player.points
+            << setw(20) << fixed << setprecision(2) << player.pointsPerGamePlayed
+            << setw(20) << player.iceTimePerGamePlayed
+            << endl;
+}
 
+// ---- STAGE 3.1 ----
 void display(const vector<Player> &players) {
     vector<Player>::const_iterator iter;
     for (iter = players.cbegin(); iter != players.cend(); iter++) {
@@ -137,7 +173,8 @@ void display(const vector<Player> &players) {
     }
 }
 
-int searchPosition(const vector<Player> &players, char position = 'p') {
+// ---- STAGE 3.2 ----
+int searchPosition(const vector<Player> &players, char position) {
     for (int i = 0; i < players.size(); i++) {
         if (players[i].position == position) {
             return i;
@@ -146,6 +183,7 @@ int searchPosition(const vector<Player> &players, char position = 'p') {
     return -1;
 }
 
+// ---- STAGE 3.3 ----
 map<string,int> countTeamPlayerRows(const vector<Player> &players) { // https://www.geeksforgeeks.org/map-of-vectors-in-c-stl-with-examples/
     map<string, int> count;
     for (int i = 0; i < players.size(); i++) {
@@ -154,6 +192,7 @@ map<string,int> countTeamPlayerRows(const vector<Player> &players) { // https://
     return count;
 }
 
+// ---- STAGE 3.4 ----
 void displayPlayerByTeam(const vector<Player> &players, const string &team) {
     bool found = false;
     for (const Player &player : players) {
@@ -172,10 +211,11 @@ void displayPlayerByTeam(const vector<Player> &players, const string &team) {
         }
     }
     if (!found) {
-        cout << "No players found on the team " << team << endl;
+        cout << "!! NO PLAYERS FOUND ON THE TEAM '" << team << "' !!" << endl;
     }
 }
 
+// ---- STAGE 3.5 ----
 int highLowAvgGoals(const vector<Player> &players, Player &highestScorer, Player &lowestScorer) {
     int max = INT_MIN;
     int min = INT_MAX;
@@ -206,6 +246,7 @@ int highLowAvgGoals(const vector<Player> &players, Player &highestScorer, Player
     return averageGoal;
 }
 
+// ---- STAGE 3.6 ----
 list<Player> searchPlayerName(const vector<Player> &players, const string &search) {
     list<Player> pList;
     vector<Player>::const_iterator iter;
@@ -217,17 +258,18 @@ list<Player> searchPlayerName(const vector<Player> &players, const string &searc
     return pList;
 }
 
+// ---- STAGE 3.7 ----
 int descendingPointsPerGame(const Player &x, const Player &y) {
     return x.pointsPerGamePlayed > y.pointsPerGamePlayed;
 }
 
 int main() {
-    // STAGE 1
+    // ---- STAGE 1 ----
     cout << "[ ..READING FROM CSV FILE ]";
     readCSV();
 
 
-    //STAGE 2
+    // ---- STAGE 2 ----
     cout << "\n[ ..READING CSV FILE WITH VECTOR OF STRUCTS ]";
     vector<Player> p;
     load("nhlstats2324.csv", p);
@@ -237,19 +279,22 @@ int main() {
     }
 
 
-    // STAGE 3
-    cout << "\n[testing display func]";
+    // ---- STAGE 3.1 ----
+    cout << "\n[ ..testing display func ]";
     headers();
     display(p);
-    // 3.2
-    cout << "\n[testing searchPosition]\n";
-    int index = searchPosition(p, 'D');
+    // ---- STAGE 3.2 ----
+    cout << "\n[ ..testing searchPosition ]\n";
+    cout << "ENTER THE HOCKEY POSITION YOU WOULD LIKE TO SEE PLAYER OF (C/D/L/R) : \n";
+    char position;
+    cin >> position;
+    int index = searchPosition(p, position);
     if (index == -1) {
-        cout << "No player(s) found at the index" << endl;
+        cout << "!! NO PLAYER(S) FOUND AT THE INDEX !!" << endl;
     }
     else {
         headers();
-        cout << "Player found at Index " << index << " ::\n" << endl;
+        cout << "- PLAYER FOUND AT INDEX " << index << " ::\n" << endl;
         cout << left
         << setw(24) << p[index].name
         << setw(10) << p[index].team
@@ -261,46 +306,54 @@ int main() {
         << setw(20) << p[index].iceTimePerGamePlayed
         << endl;
     }
-    // 3.3
-    cout << "\n[testing countTeamPlayerRows]\n";
+    // ---- STAGE 3.3 ----
+    cout << "\n[ ..testing countTeamPlayerRows ]";
+    cout << left
+    << "\n========== NHL PLAYER STATS 23/24 SEASON ==========\n"
+    << setw(24) << "Team"
+    << setw(10) << "Player Count"
+    << "\n----------------------------------------------------------------------------------------------------------------------"
+    << endl;
+
     map<string,int> countPlayers = countTeamPlayerRows(p);
     for (const auto &teamCount : countPlayers) {
-        cout << teamCount.first << " : " << teamCount.second << endl; // https://www.geeksforgeeks.org/pair-in-cpp-stl/
+        cout << left
+            << setw(24) << teamCount.first << setw(10) << teamCount.second << endl; // https://www.geeksforgeeks.org/pair-in-cpp-stl/
     }
-    // 3.4
-    cout << "\n[testing displayPlayerByTeam]\n";
-    cout << "Enter a team name : \n";
+    // ---- STAGE 3.4 ----
+    cout << "\n[ ..testing displayPlayerByTeam ]\n";
+    cout << "ENTER A TEAM NAME (case-sensitive only UPPERCASE and in 3 letter format) : \n";
     string team;
     cin >> team;
     headers();
-    cout << "PLayer(s) of " << team << " ::\n\n";
+    cout << "- PLAYER(S) OF " << team << " ::\n\n";
     displayPlayerByTeam(p, team);
-    // 3.5
-    cout << "\n[testing highLowAvgGoals]\n";
+    // ---- STAGE 3.5 ----
+    cout << "\n[ ..testing highLowAvgGoals ]\n";
     Player highestScorer;
     Player lowestScorer;
     highLowAvgGoals(p, highestScorer, lowestScorer);
-    // 3.6
-    cout << "\n[testing searchPlayerName]\n";
-    cout << "Enter text to search players names : \n";
+    // ---- STAGE 3.6 ----
+    cout << "\n[ ..testing searchPlayerName ]\n";
+    cout << "ENTER NAME TO SEARCH PLAYER(S) : \n";
     string search;
     cin >> search;
     list<Player> searchNames = searchPlayerName(p, search);
     if (!searchNames.empty()) {
         headers();
-        cout << "Player(s) found with a name containing '" << search << "' ::\n" << endl;
+        cout << "- PLAYER(S) FOUND WITH A NAME CONTAINING '" << search << "' ::\n" << endl;
         for (const Player &player : searchNames) {
             displayPlayer(player);
         }
     }
     else {
-        cout << "No player(s) found with a name containing '" << search << "'" << endl;
+        cout << "!! NO PLAYER(S) FOUND WITH A NAME CONTAINING '" << search << "' !!" << endl;
     }
-    // 3.7
-    cout << "\n[testing descendingPointsPerGame]\n";
+    // ---- STAGE 3.7 ----
+    cout << "\n[ ..testing descendingPointsPerGame ]";
     vector <Player> pDesc = p;
     sort(pDesc.begin(), pDesc.end(), descendingPointsPerGame);
     headers();
-    cout << "Players sorted by Points Per Games in descending order ::\n" << endl;
+    cout << "- PLAYERS SORTED BY 'Points Per Game' IN DESCENDING ORDER ::\n" << endl;
     display(pDesc);
 }
