@@ -143,31 +143,31 @@ void load(const string fileName, vector<Player> &players) {
 }
 void displayPlayer(const Player &player) {
     cout << left
-            << setw(24) << player.name
-            << setw(10) << player.team
-            << setw(10) << player.position
-            << setw(15) << player.gamesPlayed
-            << setw(10) << player.goals
-            << setw(10) << player.points
-            << setw(20) << fixed << setprecision(2) << player.pointsPerGamePlayed
-            << setw(20) << player.iceTimePerGamePlayed
-            << endl;
+    << setw(24) << player.name
+    << setw(10) << player.team
+    << setw(10) << player.position
+    << setw(15) << player.gamesPlayed
+    << setw(10) << player.goals
+    << setw(10) << player.points
+    << setw(20) << fixed << setprecision(2) << player.pointsPerGamePlayed
+    << setw(20) << player.iceTimePerGamePlayed
+    << endl;
 }
 
 // ---- STAGE 3.1 ----
 void display(const vector<Player> &players) {
     vector<Player>::const_iterator iter;
     for (iter = players.cbegin(); iter != players.cend(); iter++) {
-            cout << left
-            << setw(24) << iter->name
-            << setw(10) << iter->team
-            << setw(10) << iter->position
-            << setw(15) << iter->gamesPlayed
-            << setw(10) << iter->goals
-            << setw(10) << iter->points
-            << setw(20) << fixed << setprecision(2) << iter->pointsPerGamePlayed
-            << setw(20) << iter->iceTimePerGamePlayed
-            << endl;
+        cout << left
+        << setw(24) << iter->name
+        << setw(10) << iter->team
+        << setw(10) << iter->position
+        << setw(15) << iter->gamesPlayed
+        << setw(10) << iter->goals
+        << setw(10) << iter->points
+        << setw(20) << fixed << setprecision(2) << iter->pointsPerGamePlayed
+        << setw(20) << iter->iceTimePerGamePlayed
+        << endl;
     }
 }
 
@@ -192,7 +192,7 @@ vector<int> searchPosition(const vector<Player> &players, char position) { // GE
 }
 
 // ---- STAGE 3.3 ----
-map<string,int> countTeamPlayerRows(const vector<Player> &players) { // https://www.geeksforgeeks.org/map-of-vectors-in-c-stl-with-examples/
+map<string,int> countTeamPlayerRows(const vector<Player> &players) {
     map<string, int> count;
     for (int i = 0; i < players.size(); i++) {
         count[players[i].team]++;
@@ -276,7 +276,7 @@ list<Player> searchPlayerName(const vector<Player> &players, const string &searc
             }
         }
 
-        if (nameUpper.find(searchUpper) != string::npos) { // https://stackoverflow.com/questions/29461786/partial-string-search-in-c
+        if (nameUpper.find(searchUpper) != string::npos) {
             pList.push_back(*iter);
         }
     }
@@ -465,7 +465,7 @@ int main() {
                 break;
             }
             case 8: {
-                cout << "[ ..EXITING ] Thank you for using this program~" << endl;
+                cout << "[ ..NOW EXITING ] Thank you for using this program~" << endl;
                 break;
             }
             default: {
